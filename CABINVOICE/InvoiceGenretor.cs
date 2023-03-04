@@ -70,5 +70,65 @@ namespace CABINVOICE
 
             return Math.Max(totalFare, Minimum_Fare);
         }
+        
+
+        public InvoiceSummary CalculateFare(Ride[] rides) 
+        {
+          double totalFare= 0;
+            try 
+            {
+            foreach(Ride ride in rides) 
+                {
+                    totalFare += this.CalculateFare(ride.distance, ride.time);
+                }
+            
+            }
+             catch (CabinvoiceException) 
+            {
+                if (rides == null) 
+                {
+                throw new CabinvoiceException(CabinvoiceException.ExceptionType.Null_Rides,"Rides are null");
+                
+                }
+            
+            }
+            return new InvoiceSummary(rides.Length, totalFare);
+        
+        }
+
+
+        public void AddRides(string userID, Ride[]rides) 
+        {
+            try 
+            { 
+             
+                rideRiposetory.AddRide(userID,rides);
+            }
+            catch (CabinvoiceException)
+            {
+             
+            if(rides == null) 
+               {
+                    throw new CabinvoiceException(CabinvoiceException.ExceptionType.Null_Rides, "rides are null");
+                
+               }
+            }
+
+        }
+        public InvoiceSummary GetInvoiceSummary(string userID) 
+        {
+            try 
+            {
+                return this.CalculateFare(rideRiposetory.GetRides(userID));
+            }
+            catch 
+            {
+              throw new CabinvoiceException(CabinvoiceException.ExceptionType.Invailid_User_ID,"invailid User id");
+            }
+        }
+
+
     }
+
+   
 }
